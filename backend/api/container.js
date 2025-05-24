@@ -16,16 +16,16 @@ container.register({
   startUp: asFunction(startUp).singleton(),
 });
 
-const loadContainer = async () => { 
-  await container.loadModules([["routers/**/*.js"]], {
-    esModules: true, 
-    cwd:__dirname, 
+const loadContainer = async () => {
+  await container.loadModules([["routers/**/*.js"], ["modules/**/*.js"]], {
+    esModules: true,
+    cwd: __dirname,
     resolverOptions: {
-      lifetime: Lifetime.SINGLETON, 
+      lifetime: Lifetime.SINGLETON,
     },
   });
 
-  return  container;
+  return container;
 };
 
 export default loadContainer;
