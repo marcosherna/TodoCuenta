@@ -1,7 +1,11 @@
+import { Button } from "@/components/ui/button";
+
 function App() {
   return (
     <>
-      <h1 className="text-3xl font-bold underline">Hello world!</h1>
+      <div className="h-screen flex items-center justify-center bg-gray-100">
+        <Button>Click me</Button>
+      </div>
     </>
   );
 }
