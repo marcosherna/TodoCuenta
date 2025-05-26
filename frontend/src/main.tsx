@@ -3,10 +3,10 @@ import { createRoot } from "react-dom/client";
 
 import "./index.css";
 
-import LoginView from "./pages/LoginView.tsx";
+import App from "./App";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <LoginView />
+    <App />
   </StrictMode>
 );

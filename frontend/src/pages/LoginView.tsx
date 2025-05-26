@@ -10,7 +10,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+import { Link, useNavigate } from "react-router";
+
 export default function LoginView() {
+
+  const navigate = useNavigate();
+
+  const handleSubmit = () => {
+    // TODO: Implement login logic here
+    // For now, just navigate to the dashboard
+    navigate("/dashboard");
+  };
+
   return (
     <>
       <div className="flex h-screen items-center justify-center">
@@ -51,13 +62,13 @@ export default function LoginView() {
           </CardContent>
 
           <CardFooter className="flex flex-col space-y-2">
-            <Button className="w-full">Login</Button>
+            <Button className="w-full" onClick={handleSubmit}>Login</Button>
 
             <div className="mt-4 text-center text-sm">
               <span>Don't have an account? </span>
-              <a href="/register" className="text-blue-600 hover:underline">
+              <Link to="/register" className="text-blue-600 hover:underline">
                 Register
-              </a>
+              </Link>
             </div>
           </CardFooter>
         </Card>

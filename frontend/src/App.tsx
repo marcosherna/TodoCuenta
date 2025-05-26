@@ -1,12 +1,19 @@
-import { Button } from "@/components/ui/button";
+import { BrowserRouter, Routes, Route } from "react-router";
+
+import DashboardView from "@/pages/DashboardView";
+import LoginView from "@/pages/LoginView";
 
 function App() {
   return (
-    <>
-      <div className="h-screen flex items-center justify-center bg-gray-100">
-        <Button>Click me</Button>
-      </div>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LoginView />} />
+        <Route path="/dashboard" element={<DashboardView />} />
+
+        {/* Add more routes as needed */}
+        <Route path="*" element={<div>404 Not Found</div>} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
