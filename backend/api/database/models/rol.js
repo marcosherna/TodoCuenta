@@ -29,5 +29,12 @@ export default function rol(database) {
     }
   );
 
+  Rol.associate = (models) => {
+    Rol.hasMany(models.User, {
+      foreignKey: "id_rol",
+      as: "users",
+    });
+  };
+
   return Rol;
 }

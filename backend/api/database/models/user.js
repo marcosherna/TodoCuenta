@@ -37,5 +37,12 @@ export default function user(database) {
     }
   );
 
+  User.associate = (models) => {
+    User.belongsTo(models.Rol, {
+      foreignKey: "id_rol",
+      as: "rol",
+    });
+  };
+
   return User;
 }

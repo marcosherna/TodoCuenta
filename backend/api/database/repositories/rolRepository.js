@@ -1,9 +1,10 @@
-export default function (rol) {
-  const repository = rol;
+export default function (entities) {
+  const { Rol } = entities;
+  const repository = Rol;
 
   repository.isExistById = async (id) => {
-    const _rol = await rol.findOne({ where: { id } });
-    return _rol !== null && _rol !== undefined;
+    const rol = await repository.findOne({ where: { id } });
+    return rol !== null && rol !== undefined;
   };
 
   return repository;
