@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router";
 
 import DashboardView from "@/pages/DashboardView";
 import LoginView from "@/pages/LoginView";
+import RegisterView from "@/pages/RegisterView";
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <Route path="/dashboard" element={<DashboardView />} />
 
         {/* Add more routes as needed */}
+        <Route path="/register" element={<RegisterView />} />
         <Route path="*" element={<div>404 Not Found</div>} />
       </Routes>
     </BrowserRouter>
