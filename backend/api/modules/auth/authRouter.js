@@ -7,10 +7,10 @@ export default function authRouter(authController, rolRouter, userController) {
 
   router.use(`${path}`, rolRouter);
 
-  //router.post(`${path}/sign-in`, authController.signIn); // GET -> auht/sign-in
   // router.post(`${path}/sign-up`, authController.signUp);
 
   return router
     .get(`${path}/users`, asyncHandler(userController.getAll))
-    .post(`${path}/register`, asyncHandler(authController.register));
+    .post(`${path}/register`, asyncHandler(authController.register))
+    .post(`${path}/sign-in`, asyncHandler(authController.signIn));
 }
