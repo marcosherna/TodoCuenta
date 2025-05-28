@@ -17,6 +17,7 @@ import {
 
 import { ArrowUpCircleIcon, ChevronDown } from "lucide-react";
 import { items } from "@/utils/menu";
+import { Link } from "react-router";
 
 import AppSideBarFooter, { AppSideBarFooterProps } from "./AppSideBarFooter";
 import AppSideBarHeader from "./AppSideBarHeader";
@@ -57,12 +58,14 @@ export default function AppSideBar() {
                     <SidebarMenu>
                       {group.subtItems.map((subItem) => (
                         <SidebarMenuItem key={subItem.title}>
-                          <SidebarMenuButton tooltip={subItem.title}>
-                            {subItem.icon && (
-                              <subItem.icon className="w-4 h-4" />
-                            )}
-                            <span>{subItem.title}</span>
-                          </SidebarMenuButton>
+                          <Link to={subItem.url} className="w-full">
+                            <SidebarMenuButton tooltip={subItem.title}>
+                              {subItem.icon && (
+                                <subItem.icon className="w-4 h-4" />
+                              )}
+                              <span>{subItem.title}</span>
+                            </SidebarMenuButton>
+                          </Link>
                         </SidebarMenuItem>
                       ))}
                     </SidebarMenu>
@@ -76,10 +79,12 @@ export default function AppSideBar() {
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton tooltip={group.title}>
-                      {group.icon && <group.icon className="w-4 h-4" />}
-                      <span>{group.title}</span>
-                    </SidebarMenuButton>
+                    <Link to={group.url ?? ""} className="w-full">
+                      <SidebarMenuButton tooltip={group.title}>
+                        {group.icon && <group.icon className="w-4 h-4" />}
+                        <span>{group.title}</span>
+                      </SidebarMenuButton>
+                    </Link>
                   </SidebarMenuItem>
                 </SidebarMenu>
               </SidebarGroupContent>

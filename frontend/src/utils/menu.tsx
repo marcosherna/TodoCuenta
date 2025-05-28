@@ -39,7 +39,7 @@ const items = {
         { title: "Lotes", url: "/lotes", icon: BoxesIcon },
         { title: "Proveedores", url: "/proveedores", icon: TruckIcon },
         { title: "Bodegas", url: "/bodegas", icon: WarehouseIcon },
-        { title: "Sucursales", url: "/sucursales", icon: MapPinIcon },
+        { title: "Sucursales", url: "branches", icon: MapPinIcon },
       ],
     },
     {
