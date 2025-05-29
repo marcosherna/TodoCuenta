@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import DashboardView from "@/pages/DashboardView";
 import LoginView from "@/pages/LoginView";
 import RegisterView from "@/pages/RegisterView";
-import BranchesView from "@/pages/inventory/BranchesView";
+import BranchesView from "@/pages/inventory/branches/BranchesView";
 
 function App() {
   return (
