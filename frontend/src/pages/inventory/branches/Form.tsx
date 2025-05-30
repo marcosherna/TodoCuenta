@@ -1,0 +1,128 @@
+import React from "react";
+
+import {
+  Sheet,
+  SheetTitle,
+  SheetContent,
+  SheetHeader,
+  SheetDescription,
+} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+
+import z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { BranchSchema, Branch } from "./type";
+
+interface BranchFormProps {
+  onSubmit?: (data: z.infer<typeof BranchSchema>) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  branch?: Branch;
+}
+
+export function BranchForm({
+  onSubmit,
+  open,
+  onOpenChange,
+  branch,
+}: BranchFormProps) {
+  const form = useForm<z.infer<typeof BranchSchema>>({
+    resolver: zodResolver(BranchSchema),
+    defaultValues: {
+      id: 0,
+      name: "",
+      location: "",
+    },
+  });
+
+  const handleSubmit = (data: z.infer<typeof BranchSchema>) => {
+    if (onSubmit) {
+      onSubmit(data);
+    }
+  };
+
+  React.useEffect(() => {
+    if (branch) {
+      form.reset(branch);
+    } else {
+      form.reset({
+        name: "",
+        location: "",
+      });
+    }
+  }, [branch, form]);
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Branch Form</SheetTitle>
+          <SheetDescription>
+            Use this form to create or edit a branch.
+          </SheetDescription>
+        </SheetHeader>
+
+        <div className="flex flex-col gap-4 px-5">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(handleSubmit)}
+              className="space-y-4"
+            >
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        className="input"
+                        placeholder="Branch Name"
+                        autoComplete="off"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Location</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        className="input"
+                        placeholder="Branch Location"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button type="submit">Submit</Button>
+            </form>
+          </Form>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}

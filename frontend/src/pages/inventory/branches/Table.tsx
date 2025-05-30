@@ -16,14 +16,10 @@ import {
 
 import { EditButton, DeleteButton } from "@/components/ActionButtons";
 
+import { Branch } from "./type";
+
 interface DataTableProps<T> {
   table: TableType<T>;
-}
-
-export interface BranchesProps {
-  id: number;
-  name: string;
-  location: string;
 }
 
 export function BranchTable<T>({ table }: DataTableProps<T>) {
@@ -85,9 +81,9 @@ export function BranchColumns({
   onEdit,
   onDelete,
 }: {
-  onEdit: (branch: BranchesProps) => void;
+  onEdit: (branch: Branch) => void;
   onDelete: (id: number) => void;
-}): ColumnDef<BranchesProps>[] {
+}): ColumnDef<Branch>[] {
   return [
     {
       accessorKey: "id",
@@ -110,7 +106,7 @@ export function BranchColumns({
       cell: ({ row }) => (
         <div className="flex items-center space-x-2 justify-center ">
           <EditButton onClick={() => onEdit(row.original)} />
-          <DeleteButton onClick={() => onDelete(row.original.id)} />
+          <DeleteButton onClick={() => onDelete(row.original.id ?? 0)} />
         </div>
       ),
     },

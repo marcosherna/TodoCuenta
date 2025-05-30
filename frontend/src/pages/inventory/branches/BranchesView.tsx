@@ -6,19 +6,22 @@ import {
   getPaginationRowModel,
 } from "@tanstack/react-table";
 
+import { SearchBar } from "@/components/SearchBar";
 import { Button } from "@/components/ui/button";
-import { SearchBar } from "@/components/SearchBar"; 
 
 import {
   ManagerLayout,
   ManagerLayoutHeader,
   ContentWrapper,
   HeaderActions,
+  ContentFooter,
 } from "@/Layouts/ManagerLayout";
 
-import { BranchTable, BranchColumns, BranchesProps } from "./Table";
+import { BranchTable, BranchColumns } from "./Table";
+import { BranchForm } from "./Form";
+import { Branch } from "./type";
 
-const branches: BranchesProps[] = [
+const branches: Branch[] = [
   {
     id: 1,
     name: "Branch 1",
@@ -35,14 +38,30 @@ const branches: BranchesProps[] = [
     location: "Location 3",
   },
 ];
-  
-
-const columns: ColumnDef<BranchesProps>[] = BranchColumns({
-  onEdit: (branch) => console.log("Edit", branch),
-  onDelete: (id) => console.log("Delete", id),
-});
 
 export default function BranchesView() {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [selectedBranch, setSelectedBranch] = React.useState<Branch | null>(
+    null
+  );
+
+  const handleFormOpen = (action: "edit" | "create", row?: Branch) => {
+    if (action === "edit" && row) {
+      console.log("Editing branch:", row);
+      setSelectedBranch(row);
+      setIsOpen(true);
+    } else {
+      console.log("Creating new branch");
+      setSelectedBranch(null);
+      setIsOpen(true);
+    }
+  };
+
+  const columns: ColumnDef<Branch>[] = BranchColumns({
+    onEdit: (branch) => handleFormOpen("edit", branch),
+    onDelete: (id) => console.log("Delete", id),
+  });
+
   const table = useReactTable({
     data: branches,
     columns,
@@ -59,9 +78,7 @@ export default function BranchesView() {
       />
 
       <HeaderActions className="justify-between">
-        <Button onClick={() => console.log("Add New Branch")}>
-          Agregar Sucursal
-        </Button>
+        <Button onClick={() => handleFormOpen("create")}>Nuevo</Button>
 
         <SearchBar
           clearable
@@ -79,6 +96,15 @@ export default function BranchesView() {
       <ContentWrapper>
         <BranchTable table={table} />
       </ContentWrapper>
+
+      <ContentFooter>
+        <BranchForm
+          open={isOpen}
+          onOpenChange={setIsOpen}
+          branch={selectedBranch ?? undefined}
+          onSubmit={(data) => console.log("Submitted:", data)}
+        />
+      </ContentFooter>
     </ManagerLayout>
   );
 }
