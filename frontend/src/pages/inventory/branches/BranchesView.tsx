@@ -16,6 +16,7 @@ import {
   HeaderActions,
   ContentFooter,
 } from "@/Layouts/ManagerLayout";
+import { SpinnerWrapper } from "@/components/SpinnerWrapper";
 
 import { BranchTable, BranchColumns } from "./Table";
 import { BranchForm } from "./Form";
@@ -41,6 +42,8 @@ const branches: Branch[] = [
 
 export default function BranchesView() {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const [loadingForm, setLoadingForm] = React.useState(false);
   const [selectedBranch, setSelectedBranch] = React.useState<Branch | null>(
     null
   );
@@ -57,9 +60,19 @@ export default function BranchesView() {
     }
   };
 
+  const handleDelete = (id: number) => {
+    setLoading(true);
+    setTimeout(() => {
+      console.log("Branch deleted:", id);
+      setLoading(false);
+      // Here you would typically call your API to delete the branch
+      // After deletion, you might want to refresh the branches list
+    }, 1000);  
+  }
+
   const columns: ColumnDef<Branch>[] = BranchColumns({
     onEdit: (branch) => handleFormOpen("edit", branch),
-    onDelete: (id) => console.log("Delete", id),
+    onDelete: (id) => handleDelete(id),
   });
 
   const table = useReactTable({
@@ -68,6 +81,18 @@ export default function BranchesView() {
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
+
+
+  const handleSubmit = (data: Branch) => {
+    setLoadingForm(true);
+    setTimeout(() => {
+      console.log("Submitted data:", data);
+      setLoadingForm(false);
+      setIsOpen(false);
+      // Here you would typically send the data to your API
+    }, 1000);
+  }
+
 
   return (
     <ManagerLayout>
@@ -94,7 +119,9 @@ export default function BranchesView() {
       </HeaderActions>
 
       <ContentWrapper>
-        <BranchTable table={table} />
+        <SpinnerWrapper loading={loading}>
+          <BranchTable table={table} />
+        </SpinnerWrapper>
       </ContentWrapper>
 
       <ContentFooter>
@@ -102,7 +129,8 @@ export default function BranchesView() {
           open={isOpen}
           onOpenChange={setIsOpen}
           branch={selectedBranch ?? undefined}
-          onSubmit={(data) => console.log("Submitted:", data)}
+          onSubmit={handleSubmit}
+          loading={loadingForm}
         />
       </ContentFooter>
     </ManagerLayout>

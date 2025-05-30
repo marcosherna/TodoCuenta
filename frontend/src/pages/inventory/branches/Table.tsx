@@ -14,7 +14,8 @@ import {
   TableCell,
 } from "@/components/ui/table";
 
-import { EditButton, DeleteButton } from "@/components/ActionButtons";
+import { EditButton } from "@/components/ActionButtons";
+import { ConfirmDeletePopover } from "@/components/ConfirmDeletePopover";
 
 import { Branch } from "./type";
 
@@ -105,8 +106,12 @@ export function BranchColumns({
       header: "Actions",
       cell: ({ row }) => (
         <div className="flex items-center space-x-2 justify-center ">
+          <ConfirmDeletePopover
+            message="¿Estás seguro de que deseas eliminar esta sucursal?"
+            onConfirm={() => onDelete(row.original.id ?? 0)}
+          />
           <EditButton onClick={() => onEdit(row.original)} />
-          <DeleteButton onClick={() => onDelete(row.original.id ?? 0)} />
+          {/* <DeleteButton onClick={() => onDelete(row.original.id ?? 0)} /> */}
         </div>
       ),
     },

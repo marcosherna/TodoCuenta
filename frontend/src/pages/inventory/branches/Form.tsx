@@ -1,4 +1,7 @@
+import z from "zod";
 import React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
 import {
   Sheet,
@@ -20,17 +23,17 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { BarScaleMiddle } from "@/components/Spinner";
 
-import z from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { BranchSchema, Branch } from "./type";
+
+import { BranchSchema, Branch } from "./type"; 
 
 interface BranchFormProps {
   onSubmit?: (data: z.infer<typeof BranchSchema>) => void;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   branch?: Branch;
+  loading?: boolean;
 }
 
 export function BranchForm({
@@ -38,6 +41,7 @@ export function BranchForm({
   open,
   onOpenChange,
   branch,
+  loading,
 }: BranchFormProps) {
   const form = useForm<z.infer<typeof BranchSchema>>({
     resolver: zodResolver(BranchSchema),
@@ -93,6 +97,7 @@ export function BranchForm({
                         className="input"
                         placeholder="Branch Name"
                         autoComplete="off"
+                        disabled={loading}
                       />
                     </FormControl>
                     <FormMessage />
@@ -111,6 +116,8 @@ export function BranchForm({
                         {...field}
                         className="input"
                         placeholder="Branch Location"
+                        autoComplete="off"
+                        disabled={loading}
                       />
                     </FormControl>
                     <FormMessage />
@@ -118,7 +125,12 @@ export function BranchForm({
                 )}
               />
 
-              <Button type="submit">Submit</Button>
+              <Button type="submit" disabled={loading} >
+                <div className="flex items-center gap-2">
+                  {loading && <BarScaleMiddle />} 
+                  Submit
+                </div>
+              </Button>
             </form>
           </Form>
         </div>

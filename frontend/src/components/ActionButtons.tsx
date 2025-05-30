@@ -1,3 +1,4 @@
+import React from "react";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 import { Edit2, Trash2 } from "lucide-react";
@@ -27,19 +28,17 @@ export function EditButton({
   );
 }
 
-export function DeleteButton({
-  onClick,
+export function DeleteButton({ 
   className,
-  disabled,
-}: ActionButtonsProps) {
+  ...props
+}: React.ComponentProps<typeof Button>) {
   return (
-    <Button
-      onClick={onClick}
+    <Button 
       className={cn(
         "h-8 w-8 text-red-500 hover:bg-red-100 focus:bg-red-100 disabled:opacity-50 disabled:pointer-events-none bg-transparent border-1 border-red-500 hover:border-red-600 focus:border-red-600 disabled:border-gray-300",
         className
       )}
-      disabled={disabled}
+      {...props}
     >
       <Trash2 />
     </Button>
