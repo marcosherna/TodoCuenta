@@ -4,6 +4,7 @@ import DashboardView from "@/pages/DashboardView";
 import LoginView from "@/pages/LoginView";
 import RegisterView from "@/pages/RegisterView";
 import BranchesView from "@/pages/inventory/branches/BranchesView";
+import UserView from "@/pages/auth/user/UserView";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
 
         <Route path="/dashboard" element={<DashboardView />}>
           <Route path="branches" element={<BranchesView />} />
+          <Route path="users" element={<UserView />} />
         </Route>
 
         {/* Add more routes as needed */}

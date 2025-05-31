@@ -49,7 +49,7 @@ const items = {
       subtItems: [
         { title: "Clientes", url: "/clientes", icon: UsersIcon },
         { title: "Empleados", url: "/empleados", icon: UserIcon },
-        { title: "Usuarios", url: "/usuarios", icon: UserIcon },
+        { title: "Usuarios", url: "users", icon: UserIcon },
         { title: "Roles", url: "/roles", icon: ShieldIcon },
       ],
     },
