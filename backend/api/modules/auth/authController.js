@@ -1,3 +1,5 @@
+import { sign } from "../../libs/jwt.js"
+
 export default function autController(authService) {
   const controller = {};
 
@@ -5,7 +7,12 @@ export default function autController(authService) {
     const { email, password } = req.body;
     const user = await authService.signIn(email, password);
 
-    res.status(200).json(user);
+    const token = sign(user.get({ plain: true }))
+
+    res.status(200).json({
+      message: "Sign in successfully",
+      token
+    });
   };
 
   controller.register = async (req, res) => {
@@ -18,7 +25,12 @@ export default function autController(authService) {
       id_rol,
     });
 
-    res.status(201).json(newUser);
+    const token = sign(newUser.get({ plain: true }))
+
+    res.status(201).json({
+      message: "register successfully",
+      token
+    });
   };
 
   return controller;
