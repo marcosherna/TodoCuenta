@@ -3,8 +3,8 @@ import {
   ColumnDef,
   useReactTable,
   getCoreRowModel,
-  getPaginationRowModel,
 } from "@tanstack/react-table";
+import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 
 import { SearchBar } from "@/components/SearchBar";
 import { Button } from "@/components/ui/button";
@@ -17,82 +17,112 @@ import {
   ContentFooter,
 } from "@/Layouts/ManagerLayout";
 import { SpinnerWrapper } from "@/components/SpinnerWrapper";
+import PaginateTable from "@/components/PaginateTable";
+import { toast } from "sonner";
 
 import { BranchTable, BranchColumns } from "./Table";
 import { BranchForm } from "./Form";
-import { Branch } from "./type";
+import { BrancheType, ResponseApiSchema, TypeResponseApiSchema } from "./type";
 
-const branches: Branch[] = [
-  {
-    id: 1,
-    name: "Branch 1",
-    location: "Location 1",
-  },
-  {
-    id: 2,
-    name: "Branch 2",
-    location: "Location 2",
-  },
-  {
-    id: 3,
-    name: "Branch 3",
-    location: "Location 3",
-  },
-];
+import { END_POINTS, TANSTACK_KEY } from "@/utils/const";
+import { axios } from "@/lib/axios";
 
 export default function BranchesView() {
+  const limit = 5;
+  const [page, setPage] = React.useState(1);
   const [isOpen, setIsOpen] = React.useState(false);
-  const [loading, setLoading] = React.useState(false);
   const [loadingForm, setLoadingForm] = React.useState(false);
-  const [selectedBranch, setSelectedBranch] = React.useState<Branch | null>(
-    null
-  );
+  const [selectedBranch, setSelectedBranch] =
+    React.useState<BrancheType | null>(null);
 
-  const handleFormOpen = (action: "edit" | "create", row?: Branch) => {
+  const {
+    data: paginateData,
+    isLoading,
+    refetch,
+  } = useQuery<TypeResponseApiSchema, Error>({
+    queryKey: [TANSTACK_KEY.GET_BRANCHES, page],
+    queryFn: async () => {
+      try {
+        const response = await axios.get(END_POINTS.BRANCH.GET, {
+          params: { page, limit },
+        });
+        return ResponseApiSchema.parse(response.data); // sin try/catch aquí
+      } catch (error) {
+        toast.error(
+          "Error al obtener las sucursales: " + (error as Error).message
+        );
+      }
+    },
+    keepPreviousData: true,
+    onError: (error: Error) => {
+      console.error("Error fetching branches:", error);
+    },
+  } as UseQueryOptions<TypeResponseApiSchema, Error>);
+
+  const handleFormOpen = (action: "edit" | "create", row?: BrancheType) => {
     if (action === "edit" && row) {
-      console.log("Editing branch:", row);
       setSelectedBranch(row);
       setIsOpen(true);
     } else {
-      console.log("Creating new branch");
       setSelectedBranch(null);
       setIsOpen(true);
     }
   };
 
-  const handleDelete = (id: number) => {
-    setLoading(true);
-    setTimeout(() => {
-      console.log("Branch deleted:", id);
-      setLoading(false);
-      // Here you would typically call your API to delete the branch
-      // After deletion, you might want to refresh the branches list
-    }, 1000);  
-  }
+  const handleDelete = async (id: number) => {
+    try {
+      const response = await axios.delete(`${END_POINTS.BRANCH.DELETE}/${id}`);
+      if (response.status != 204) {
+        throw new Error(
+          response.data.message || "Error al eliminar la sucursal"
+        );
+      }
+      toast.success("Sucursal eliminada correctamente");
+      await refetch();
+    } catch (error) {
+      toast.error("Error al eliminar la sucursal: " + (error as Error).message);
+    }
+  };
 
-  const columns: ColumnDef<Branch>[] = BranchColumns({
+  const columns: ColumnDef<BrancheType>[] = BranchColumns({
     onEdit: (branch) => handleFormOpen("edit", branch),
     onDelete: (id) => handleDelete(id),
   });
 
   const table = useReactTable({
-    data: branches,
+    data: paginateData?.data ?? [],
+    pageCount: paginateData?.pagination.totalPages ?? -1,
     columns,
+    state: {
+      pagination: {
+        pageIndex: page,
+        pageSize: limit,
+      },
+    },
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    manualPagination: true,
   });
 
+  const handleSubmit = async (data: BrancheType) => {
+    try {
+      setLoadingForm(true);
+      const apiCall = selectedBranch
+        ? axios.put(`${END_POINTS.BRANCH.PUT}/${selectedBranch.id}`, data)
+        : axios.post(END_POINTS.BRANCH.POST, data);
 
-  const handleSubmit = (data: Branch) => {
-    setLoadingForm(true);
-    setTimeout(() => {
-      console.log("Submitted data:", data);
-      setLoadingForm(false);
+      await apiCall;
+      toast.success(
+        `Sucursal ${selectedBranch ? "actualizada" : "creada"} correctamente`
+      );
       setIsOpen(false);
-      // Here you would typically send the data to your API
-    }, 1000);
-  }
-
+      setSelectedBranch(null);
+      refetch();
+    } catch (error) {
+      toast.error("Error al guardar la sucursal: " + (error as Error).message);
+    } finally {
+      setLoadingForm(false);
+    }
+  };
 
   return (
     <ManagerLayout>
@@ -119,12 +149,22 @@ export default function BranchesView() {
       </HeaderActions>
 
       <ContentWrapper>
-        <SpinnerWrapper loading={loading}>
+        <SpinnerWrapper loading={isLoading}>
           <BranchTable table={table} />
         </SpinnerWrapper>
       </ContentWrapper>
 
       <ContentFooter>
+        <PaginateTable
+          currentPage={paginateData?.pagination.currentPage ?? 1}
+          totalPages={paginateData?.pagination.totalPages ?? 1}
+          onPageChange={(p) => {
+            if (p !== page) {
+              console.log("Page changed", p);
+              setPage(p);
+            }
+          }}
+        />
         <BranchForm
           open={isOpen}
           onOpenChange={setIsOpen}

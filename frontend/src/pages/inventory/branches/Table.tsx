@@ -17,7 +17,7 @@ import {
 import { EditButton } from "@/components/ActionButtons";
 import { ConfirmDeletePopover } from "@/components/ConfirmDeletePopover";
 
-import { Branch } from "./type";
+import { BrancheType } from "./type";
 
 interface DataTableProps<T> {
   table: TableType<T>;
@@ -82,9 +82,9 @@ export function BranchColumns({
   onEdit,
   onDelete,
 }: {
-  onEdit: (branch: Branch) => void;
+  onEdit: (branch: BrancheType) => void;
   onDelete: (id: number) => void;
-}): ColumnDef<Branch>[] {
+}): ColumnDef<BrancheType>[] {
   return [
     {
       accessorKey: "id",
@@ -100,6 +100,32 @@ export function BranchColumns({
       accessorKey: "location",
       header: "Location",
       cell: ({ cell }) => cell.getValue(),
+    },
+    {
+      accessorKey: "createdAt",
+      header: "Created At",
+      cell: ({ cell }) => {
+        if (!cell.getValue()) return "N/A";
+        const date = new Date(cell.getValue() as string);
+        return date.toLocaleDateString("es-ES", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        });
+      },
+    },
+    {
+      accessorKey: "updatedAt",
+      header: "Updated At",
+      cell: ({ cell }) => {
+        if (!cell.getValue()) return "N/A";
+        const date = new Date(cell.getValue() as string);
+        return date.toLocaleDateString("es-ES", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        });
+      },
     },
     {
       id: "actions",

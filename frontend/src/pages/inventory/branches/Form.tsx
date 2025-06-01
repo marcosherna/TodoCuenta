@@ -1,4 +1,3 @@
-import z from "zod";
 import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -25,14 +24,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { BarScaleMiddle } from "@/components/Spinner";
 
-
-import { BranchSchema, Branch } from "./type"; 
+import { BranchSchema, BrancheType } from "./type";
 
 interface BranchFormProps {
-  onSubmit?: (data: z.infer<typeof BranchSchema>) => void;
+  onSubmit?: (data: BrancheType) => void;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  branch?: Branch;
+  branch?: BrancheType;
   loading?: boolean;
 }
 
@@ -43,7 +41,7 @@ export function BranchForm({
   branch,
   loading,
 }: BranchFormProps) {
-  const form = useForm<z.infer<typeof BranchSchema>>({
+  const form = useForm<BrancheType>({
     resolver: zodResolver(BranchSchema),
     defaultValues: {
       id: 0,
@@ -52,7 +50,7 @@ export function BranchForm({
     },
   });
 
-  const handleSubmit = (data: z.infer<typeof BranchSchema>) => {
+  const handleSubmit = (data: BrancheType) => {
     if (onSubmit) {
       onSubmit(data);
     }
@@ -125,9 +123,9 @@ export function BranchForm({
                 )}
               />
 
-              <Button type="submit" disabled={loading} >
+              <Button type="submit" disabled={loading}>
                 <div className="flex items-center gap-2">
-                  {loading && <BarScaleMiddle />} 
+                  {loading && <BarScaleMiddle />}
                   Submit
                 </div>
               </Button>
