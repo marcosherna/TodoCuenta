@@ -7,4 +7,14 @@ export const PaginateSchema = z.object({
   limit: z.number(),
 });
 
+export const RolSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  description: z.string(),
+  status: z.boolean(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+});
+
+export type RolType = z.infer<typeof RolSchema>;
 export type PaginateType = z.infer<typeof PaginateSchema>;
