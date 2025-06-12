@@ -22,5 +22,13 @@ export default function userRepository(entities) {
     return user;
   };
 
+  repository.updateAndResponse = async (id, userData) => {
+    await repository.update(userData, {
+      where: { id },
+    });
+
+    return await repository.findOne({ where: { id } });
+  };
+
   return repository;
 }
