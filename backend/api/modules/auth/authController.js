@@ -1,4 +1,5 @@
-import { sign } from "../../libs/jwt.js"
+import { sign } from "../../libs/jwt.js";
+import { config } from "../../libs/cookieParser.js";
 
 export default function autController(authService) {
   const controller = {};
@@ -7,11 +8,13 @@ export default function autController(authService) {
     const { email, password } = req.body;
     const user = await authService.signIn(email, password);
 
-    const token = sign(user.get({ plain: true }))
+    const token = sign(user.get({ plain: true }));
+
+    res.cookie("token", token, { ...config });
 
     res.status(200).json({
       message: "Sign in successfully",
-      token
+      user: user.get({ plain: true }),
     });
   };
 
@@ -25,11 +28,11 @@ export default function autController(authService) {
       id_rol,
     });
 
-    const token = sign(newUser.get({ plain: true }))
-
+    const token = sign(newUser.get({ plain: true }));
+    res.cookie("token", token, { ...config });
     res.status(201).json({
       message: "register successfully",
-      token
+      user: newUser.get({ plain: true }),
     });
   };
 

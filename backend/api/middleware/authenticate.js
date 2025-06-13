@@ -1,19 +1,24 @@
-import { verify } from "../libs/jwt.js"
+import { verify } from "../libs/jwt.js";
 import Unauthorized from "../errors/unauthorized.js";
 
 export default function authenticate(req, res, next) {
-    const authHeader = req.headers.authorization;
+  try {
+    const token = req.cookies.token;
 
-    if (!authHeader || !authHeader.startsWith("Bearer "))
-        next(new Unauthorized("No token provided"))
+    if (!token) throw new Unauthorized("Token not provided");
 
-    const token = authHeader.split(" ")[1];
+    const user = verify(token);
 
-    try {
-        const decoded = verify(token);
-        req.user = decoded;
-        next();
-    } catch (err) {
-        next(new Unauthorized("Invalid or expired token"))
-    }
+    req.session = {
+      user,
+    };
+
+    next();
+  } catch (err) {
+    if (err.name === "TokenExpiredError")
+      throw new Unauthorized("Token expired");
+    if (err.name === "JsonWebTokenError")
+      throw new Unauthorized("Token invalid");
+    next(err);
+  }
 }
