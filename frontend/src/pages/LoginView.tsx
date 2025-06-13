@@ -15,11 +15,15 @@ import {
   FormMessage,
   FormLabel,
 } from "@/components/ui/form";
+
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-
 import { Link, useNavigate } from "react-router";
+import { toast } from "sonner";
+
+import { axios } from "@/lib/axios";
+import { END_POINTS } from "@/utils/const";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -36,11 +40,14 @@ export default function LoginView() {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    console.log("Form submitted:", data);
-    // TODO: Implement login logic here
-    // For now, just navigate to the dashboard
-    navigate("/dashboard");
+  const onSubmit = async (data: z.infer<typeof formSchema>) => { 
+    try {
+      const response = await axios.post(END_POINTS.AUTH.LOGIN, data);
+      console.log("Login successful:", response.data);
+      navigate("/dashboard");
+    } catch (error) { 
+      toast.error("Login failed: " + (error as Error).message);
+    } 
   };
 
   return (

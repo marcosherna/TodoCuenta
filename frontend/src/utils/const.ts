@@ -1,5 +1,12 @@
 
 export const END_POINTS = {
+    AUTH: {
+        LOGIN: "/auth/sign-in",
+        LOGOUT: "/auth/logout",
+        REGISTER: "/auth/register",
+        FORGOT_PASSWORD: "/auth/forgot-password",
+        RESET_PASSWORD: "/auth/reset-password",
+    }, 
     BRANCH: {
         GET: "/administration/branches",
         POST: "/administration/branches",
@@ -7,16 +14,16 @@ export const END_POINTS = {
         DELETE: "/administration/branches",
     }, 
     USERS: {
-        GET: "/auth/users",
-        POST: "/auth/users",
-        PUT: "/auth/users",
-        DELETE: "/auth/users",
+        GET: "/administration/users",
+        POST: "/administration/users",
+        PUT: "/administration/users",
+        DELETE: "/administration/users",
     }, 
     ROLES: {
-        GET: "/auth/rol",
-        POST: "/auth/rol",
-        PUT: "/auth/rol",
-        DELETE: "/auth/rol",
+        GET: "/administration/rol",
+        POST: "/administration/rol",
+        PUT: "/administration/rol",
+        DELETE: "/administration/rol",
     }
 }
 

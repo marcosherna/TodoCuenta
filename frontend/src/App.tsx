@@ -5,6 +5,7 @@ import LoginView from "@/pages/LoginView";
 import RegisterView from "@/pages/RegisterView";
 import BranchesView from "@/pages/inventory/branches/BranchesView";
 import UserView from "@/pages/auth/user/UserView";
+import UnauthorizedView from "@/pages/UnauthorizedView";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         {/* Add more routes as needed */}
         <Route path="/register" element={<RegisterView />} />
         <Route path="*" element={<div>404 Not Found</div>} />
+        <Route path="/unauthorized" element={<UnauthorizedView />} />
       </Routes>
     </BrowserRouter>
   );
