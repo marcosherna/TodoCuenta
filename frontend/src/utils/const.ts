@@ -5,6 +5,18 @@ export const END_POINTS = {
         POST: "/administration/branches",
         PUT: "/administration/branches",
         DELETE: "/administration/branches",
+    }, 
+    USERS: {
+        GET: "/auth/users",
+        POST: "/auth/users",
+        PUT: "/auth/users",
+        DELETE: "/auth/users",
+    }, 
+    ROLES: {
+        GET: "/auth/rol",
+        POST: "/auth/rol",
+        PUT: "/auth/rol",
+        DELETE: "/auth/rol",
     }
 }
 

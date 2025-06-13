@@ -6,6 +6,7 @@ import {
   ContentFooter,
   ContentWrapper,
 } from "@/Layouts/ManagerLayout";
+
 import { Button } from "@/components/ui/button";
 import { SearchBar } from "@/components/SearchBar";
 import { SpinnerWrapper } from "@/components/SpinnerWrapper";
@@ -16,84 +17,118 @@ import {
   getPaginationRowModel,
   ColumnDef,
 } from "@tanstack/react-table";
+import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
+
+import { END_POINTS, TANSTACK_KEY } from "@/utils/const";
+import { axios } from "@/lib/axios";
 
 import { UserForm } from "./form";
 import { UserType } from "./type";
 import { UserTable, UserColumns } from "./Table";
-
-const user: UserType[] = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "john.doe@example.com",
-    password: "password123",
-    id_rol: 1,
-    createdAt: new Date().toDateString(),
-    updatedAt: new Date().toDateString(),
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    email: "jane.smith@example.com",
-    password: "password123",
-    id_rol: 2,
-    createdAt: new Date().toDateString(),
-    updatedAt: new Date().toDateString(),
-  },
-  {
-    id: 3,
-    name: "Alice Johnson",
-    email: "alice.johnson@example.com",
-    password: "password123",
-    id_rol: 3,
-    createdAt: new Date().toDateString(),
-    updatedAt: new Date().toDateString(),
-  },
-  {
-    id: 4,
-    name: "Bob Brown",
-    email: "bob.brown@example.com",
-    password: "password123",
-    id_rol: 4,
-    createdAt: new Date().toDateString(),
-    updatedAt: new Date().toDateString(),
-  },
-];
-
+import { DataTablePagination } from "@/components/DataTablePagination";
 
 export default function UserView() {
   const [loadingForm, setLoadingForm] = React.useState(false);
   const [openForm, setOpenForm] = React.useState(false);
+  const [selectedUser, setSelectedUser] = React.useState<UserType | undefined>(
+    undefined
+  );
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 5, 
+  });
 
-  const handleOpenForm = () => {
-    setOpenForm(!openForm);
+  const handleOpenForm = (action: "edit" | "create", row?: UserType) => {
+    if (action === "edit" && row) {
+      setSelectedUser(row); 
+    } else {
+      setSelectedUser(undefined);
+      console.log(selectedUser) 
+    }
+    setOpenForm(true);
   };
 
-  const handleSubmit = (data: UserType) => {
-    setLoadingForm(true);
-    // Simulate an API call
-    setTimeout(() => {
-      console.log("User data submitted:", data);
-      setLoadingForm(false);
+  const { data: roles } = useQuery({
+    queryKey: [TANSTACK_KEY.GET_ROLES],
+    queryFn: async () => {
+      try {
+        const response = await axios.get(END_POINTS.ROLES.GET);
+        return response.data ?? [];
+      } catch (error) {
+        toast.error("Error al obtener los roles: " + (error as Error).message);
+      }
+    },
+  });
+
+  const { data: users, refetch } = useQuery({
+    queryKey: [TANSTACK_KEY.GET_USERS],
+    queryFn: async () => {
+      try {
+        const response = await axios.get(END_POINTS.USERS.GET);
+        return response.data ?? [];
+      } catch (error) {
+        toast.error(
+          "Error al obtener los usuarios: " + (error as Error).message
+        );
+      }
+    },
+  });
+
+  const handleSubmit = async (data: UserType) => {
+    try {
+      setLoadingForm(true);
+
+      console.log(data);
+
+      data.id = selectedUser?.id;
+      const apiCall = selectedUser
+        ? axios.put(`${END_POINTS.USERS.PUT}/${selectedUser.id}`, data)
+        : axios.post(END_POINTS.USERS.POST, data);
+
+      await apiCall;
+      toast.success(
+        `Usuario ${selectedUser ? "actualizado" : "creado"} correctamente`
+      );
       setOpenForm(false);
-    }, 2000);
+      setSelectedUser(undefined);
+      refetch();
+    } catch (error) {
+      console.error("Error al guardar el usuario:", error);
+      toast.error("Error al guardar el usuario: " + (error as Error).message);
+    } finally {
+      setLoadingForm(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      const response = await axios.delete(`${END_POINTS.USERS.DELETE}/${id}`);
+      if (response.status != 204) {
+        throw new Error(
+          response.data.message || "Error al eliminar el usuario"
+        );
+      }
+      toast.success("Usuario eliminado  correctamente");
+      await refetch();
+    } catch (error) {
+      toast.error("Error al eliminar el usuario: " + (error as Error).message);
+    }
   };
 
   const columns: ColumnDef<UserType>[] = UserColumns({
-    onEdit: (user) => {
-      console.log("Edit user:", user);
-      setOpenForm(true);
-    },
-    onDelete: (user) => {
-      console.log("Delete user:", user);
-      // Implement delete logic here
-    },
+    onEdit: (user) => handleOpenForm("edit", user),
+    onDelete: (id) => handleDelete(id),
+    roles: roles ?? [],
   });
- 
 
   const table = useReactTable({
-    data: user,
+    data: users ?? [],
     columns: columns,
+    state: {
+      pagination,
+    },
+    onPaginationChange: setPagination, 
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
@@ -107,7 +142,7 @@ export default function UserView() {
       ></ManagerLayoutHeader>
 
       <HeaderActions className="justify-between">
-        <Button onClick={handleOpenForm} className="w-fit">
+        <Button onClick={() => handleOpenForm("create")} className="w-fit">
           Nuevo
         </Button>
 
@@ -117,11 +152,15 @@ export default function UserView() {
       <ContentWrapper>
         <SpinnerWrapper loading={false}>
           <UserTable table={table} />
+
+          <DataTablePagination table={table} />
         </SpinnerWrapper>
       </ContentWrapper>
 
       <ContentFooter>
         <UserForm
+          roles={roles ?? []}
+          user={selectedUser}
           loading={loadingForm}
           open={openForm}
           onSubmit={handleSubmit}

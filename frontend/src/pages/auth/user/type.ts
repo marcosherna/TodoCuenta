@@ -15,7 +15,7 @@ export const userSchema = z.object({
     .string()
     .min(6, "Password must be at least 6 characters long")
     .max(100, "Password must be at most 100 characters long"),
-  id_rol: z.number().min(1),
+  id_rol: z.string(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
 });

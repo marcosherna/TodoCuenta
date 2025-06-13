@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Sheet,
   SheetHeader,
@@ -14,11 +15,22 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectLabel,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { ButtonWithLoading } from "@/components/ButtonWithLoadig";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+
+import { RolType } from "@/utils/types";
 
 import { UserType, userSchema } from "./type";
 
@@ -29,6 +41,8 @@ interface UserFormProps {
   description?: string;
   onSubmit?: (data: UserType) => void;
   loading?: boolean;
+  roles: RolType[];
+  user?: UserType | undefined;
 }
 
 export function UserForm({
@@ -38,20 +52,46 @@ export function UserForm({
   description,
   onSubmit,
   loading = false,
+  roles,
+  user = undefined,
 }: UserFormProps) {
+  const [enabledEditPassword, setEnabledEditPassword] =
+    React.useState<boolean>(false);
+
   const form = useForm<UserType>({
     resolver: zodResolver(userSchema),
     defaultValues: {
       name: "",
       email: "",
       password: "",
-      id_rol: 1,
+      id_rol: "1",
     },
   });
+
+  React.useEffect(() => {
+    if (user) {
+      form.reset({
+        name: user.name,
+        email: user.email,
+        password: user.password,
+        id_rol: user.id_rol.toString(),
+      });
+      setEnabledEditPassword(false);
+    } else {
+      form.reset({
+        name: "",
+        email: "",
+        password: "",
+        id_rol: "1",
+      });
+      setEnabledEditPassword(true);
+    }
+  }, [user, form]);
 
   const handleSubmit = (data: UserType) => {
     if (onSubmit) {
       onSubmit(data);
+      form.reset();
     }
   };
 
@@ -122,7 +162,7 @@ export function UserForm({
                         placeholder="Contraseña"
                         {...field}
                         autoComplete="new-password"
-                        disabled={loading}
+                        disabled={loading || !enabledEditPassword}
                       />
                     </FormControl>
                     <FormMessage />
@@ -130,7 +170,42 @@ export function UserForm({
                 )}
               />
 
-              <ButtonWithLoading type="submit" isLoading={loading}>
+              <FormField
+                control={form.control}
+                name="id_rol"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Rol</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value.toString()}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar Rol" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Roles</SelectLabel>
+                          {roles?.map((rol: RolType) => (
+                            <SelectItem key={rol.id} value={`${rol.id}`}>
+                              {rol.name}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <ButtonWithLoading
+                className="mt-5 w-full"
+                type="submit"
+                isLoading={loading}
+              >
                 Guardar
               </ButtonWithLoading>
             </form>
